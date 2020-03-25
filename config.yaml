@@ -1,0 +1,5 @@
+db:
+  host:  "localhost"
+  user:  "user"
+  database: "postgres"
+  ssl_mode : "false"

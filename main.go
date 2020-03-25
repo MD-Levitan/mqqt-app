@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/MD-Levitan/mqqt-app/config"
 	"github.com/MD-Levitan/mqqt-app/router"
+
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 )
@@ -54,5 +56,8 @@ func (subcriber MQTTSubscriber) wait() {
 // }
 
 func main() {
+	if _, err := config.InitConfig("config.yaml"); err != nil {
+		logrus.Error("Cannot open config")
+	}
 	http.ListenAndServe(":10000", router.MakeRouter())
 }
