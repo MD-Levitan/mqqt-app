@@ -20,10 +20,13 @@ func makeWebRouter(mainRouter *mux.Router) {
 
 	authRouter := apiRouter.PathPrefix("").Subrouter()
 	authRouter.Use(authorizeByCookie)
-	apiRouter.HandleFunc("/status", JSONHandler(statusHandler)).Methods("GET")
+
+	apiRouter.HandleFunc("/logout", JSONHandler(logoutHandler)).Methods("GET")
+	apiRouter.HandleFunc("/status", JSONHandler(userStatusHandler)).Methods("GET")
 	authRouter.HandleFunc("/temperature", JSONHandler(userTemperatureHandler)).Methods("GET")
 	authRouter.HandleFunc("/pressure", JSONHandler(userPressureHandler)).Methods("GET")
 	authRouter.HandleFunc("/humidity", JSONHandler(userHumidityHandler)).Methods("GET")
+	authRouter.HandleFunc("/weather", JSONHandler(userWeatherHandler)).Methods("GET")
 
 	adminRouter := authRouter.PathPrefix("/admin").Subrouter()
 	adminRouter.HandleFunc("/battery", JSONHandler(authHandler)).Methods("GET")

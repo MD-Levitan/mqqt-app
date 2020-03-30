@@ -7,19 +7,20 @@ import (
 	"os"
 	"path"
 
+	"github.com/boltdb/bolt"
 	"github.com/gorilla/sessions"
+	"github.com/skynet0590/boltstore/store"
+	"github.com/yosssi/boltstore/reaper"
 	"gopkg.in/yaml.v2"
 )
 
 var config *Config
-var store *sessions.FilesystemStore
+var db *bolt.DB
+var session_store *store.Store
 
 type DBConfig struct {
-	Host     string `yaml:"host"`
-	User     string `yaml:"user"`
-	Database string `yaml:"database"`
-	Password string `yaml:"-"`
-	SSLMode  string `yaml:"ssl_mode"`
+	Database string      `yaml:"file"`
+	Password os.FileMode `yaml:"filemod"`
 }
 
 type WebConfig struct {
@@ -46,9 +47,6 @@ func makeConfig(appPath string, configName string) (*Config, error) {
 	}
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		return config, err
-	}
-	if config.DB.Password, err = ReadSecret(appPath, "db_password"); err != nil {
 		return config, err
 	}
 	if config.Web.SessionKey, err = ReadSecret(appPath, "session_key"); err != nil {
@@ -82,8 +80,24 @@ func ReadSecret(secretPath string, secretName string) (string, error) {
 	}
 }
 
-func GetStore() *sessions.FilesystemStore {
-	return store
+func GetDB() *bolt.DB {
+	return db
+}
+
+func InitDB(path string, mode os.FileMode) error {
+	if db_, err := bolt.Open(path, mode, nil); err != nil {
+		return err
+	} else {
+		db = db_
+
+	}
+	defer db.Close()
+	// Invoke a reaper which checks and removes expired sessions periodically.
+	defer reaper.Quit(reaper.Run(db, reaper.Options{}))
+}
+
+func GetStore() *store.Store {
+	return session_store
 }
 
 func InitStore() error {
@@ -92,12 +106,11 @@ func InitStore() error {
 		return fmt.Errorf("congfig is not init")
 	}
 	/* TODO: Change second key */
-	store = sessions.NewFilesystemStore("./session", []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
-
-	store.Options = &sessions.Options{
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		MaxAge:   3600,
-	}
+	session_store = store.Store(db,
+		&sessions.Options{
+			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
+			MaxAge:   60},
+		[]byte(config.Web.SessionKey))
 	return nil
 }

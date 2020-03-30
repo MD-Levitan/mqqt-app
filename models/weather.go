@@ -2,8 +2,6 @@ package models
 
 import (
 	"encoding/json"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Temperature struct {
@@ -18,22 +16,22 @@ type Humidity struct {
 	Humidity uint8 `json:"humidity"`
 }
 
+type Weather struct {
+	TemperatureData []float32 `json:"temperature"`
+	PressureData    []uint16  `json:"pressure"`
+	HumidityData    []uint16  `json:"humidity"`
+}
+
 type TemperatureData struct {
-	LTemperature []Temperature `json:"temperature"`
+	Temperature []float32 `json:"temperature"`
 }
 
 type PressureData struct {
-	LPressure []Pressure `json:"pressure"`
+	Pressure []uint16 `json:"pressure"`
 }
 
 type HumidityData struct {
-	LHumidity []Humidity `json:"humidity"`
-}
-
-type Weather struct {
-	Temp  TemperatureData
-	Press PressureData
-	Hum   HumidityData
+	Humidity []uint16 `json:"humidity"`
 }
 
 func NewWeather() *Weather {
@@ -45,21 +43,17 @@ func (weather *Weather) UpdateWeatherByTopic(topic TopicType, data []byte) {
 	case UserTemperatureTopic:
 		temp := Temperature{}
 		json.Unmarshal([]byte(data), &temp)
-		weather.Temp.LTemperature = append(weather.Temp.LTemperature, temp)
-		logrus.Print(&weather)
-		logrus.Print(weather)
-		logrus.Print(temp)
-		logrus.Print(weather.Temp.LTemperature)
+		weather.TemperatureData = append(weather.TemperatureData, temp.Temperature)
 
 	case UserPressureTopic:
 		press := Pressure{}
 		json.Unmarshal([]byte(data), &press)
-		weather.Press.LPressure = append(weather.Press.LPressure, press)
+		weather.PressureData = append(weather.PressureData, press.Pressure)
 
 	case UserHumidityTopic:
 		hum := Humidity{}
 		json.Unmarshal([]byte(data), &hum)
-		weather.Hum.LHumidity = append(weather.Hum.LHumidity, hum)
+		weather.HumidityData = append(weather.HumidityData, uint16(hum.Humidity))
 
 	}
 }

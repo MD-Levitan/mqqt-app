@@ -59,6 +59,7 @@ func authorizeByCookie(next http.Handler) http.Handler {
 		}
 
 		context := getUserContext(session)
+		logrus.Error(context)
 		if context == nil {
 			session.AddFlash("You don't have access!")
 			err = session.Save(r, w)

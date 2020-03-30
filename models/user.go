@@ -53,10 +53,26 @@ func NewUserContext(user User) *UserContext {
 	weather := &Weather{}
 	uctx := &UserContext{User: user}
 	subsciber := NewMQTTSubscriberConfig("user", UserTopics[:], weather)
+	if subsciber == nil {
+		return nil
+	}
 	//go goMQTT(subsciber)
 	globalContainer.MQTTContainer[uctx.User.Password] = subsciber
 	globalContainer.WeatherContainer[uctx.User.Password] = weather
 	return uctx
+}
+
+func DeleteUserContext(uctx *UserContext) {
+	/* Remove Weather */
+	delete(globalContainer.WeatherContainer, uctx.User.Password)
+
+	/* Remove Subcriber */
+	if subsciber, ok := globalContainer.MQTTContainer[uctx.User.Password]; !ok || subsciber == nil {
+		return
+	} else {
+		subsciber.Client.Disconnect(0)
+		delete(globalContainer.MQTTContainer, uctx.User.Password)
+	}
 }
 
 func (ctx UserContext) GetWeather() *Weather {
@@ -68,11 +84,11 @@ func (ctx UserContext) GetWeather() *Weather {
 }
 
 /* TODO:
- *	1. Rewrite json API
+ *	1. Rewrite json API - DONE
  *	2. Rework&change storage
  *  3. Remove Key
  *  4. Add secure MQTT
- *  5. Add logout
+ *  5. Add logout - DONE
  *	6. Add destroying of objects
  *	7. Add more api and admin, healt
  */

@@ -40,6 +40,7 @@ func NewMQTTSubscriber(protocol string, host string, port uint16, clientID strin
 	client := MQTT.NewClient(options)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		logrus.Error(token.Error())
+		return nil
 	} else {
 		logrus.Printf("Connected to server\n")
 	}
