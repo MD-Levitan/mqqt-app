@@ -1,49 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"encoding/gob"
 	"net/http"
 
 	"github.com/MD-Levitan/mqqt-app/config"
+	"github.com/MD-Levitan/mqqt-app/models"
 	"github.com/MD-Levitan/mqqt-app/router"
 
-	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 )
-
-type MQTTSubscriber struct {
-	Options *MQTT.ClientOptions
-	Client  MQTT.Client
-}
-
-func NewMQTTSubscriber(protocol string, host string, port uint16, clientID string, topic string) *MQTTSubscriber {
-	var handler MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
-		logrus.Printf("MSG: %s\n", msg.Payload())
-	}
-
-	options := MQTT.NewClientOptions().AddBroker(fmt.Sprintf("%s://%s:%d", protocol, host, port))
-	options.SetClientID(clientID)
-	options.SetDefaultPublishHandler(handler)
-
-	options.OnConnect = func(c MQTT.Client) {
-		if token := c.Subscribe(topic, 0, handler); token.Wait() && token.Error() != nil {
-			logrus.Error(token.Error())
-		}
-	}
-	client := MQTT.NewClient(options)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		logrus.Error(token.Error())
-	} else {
-		logrus.Printf("Connected to server\n")
-	}
-
-	sub := &MQTTSubscriber{Options: options, Client: client}
-	return sub
-}
-
-func (subcriber MQTTSubscriber) wait() {
-	logrus.Print("%s", subcriber.Client)
-}
 
 // func main() {
 // 	c := make(chan os.Signal, 1)
@@ -56,8 +22,21 @@ func (subcriber MQTTSubscriber) wait() {
 // }
 
 func main() {
-	if _, err := config.InitConfig("config.yaml"); err != nil {
-		logrus.Error("Cannot open config")
+
+	models.InitGlobalContainer()
+
+	gob.Register(&models.UserContext{})
+	gob.Register(&models.User{})
+
+	if err := config.InitConfig("config.yaml"); err != nil {
+		logrus.Error("Cannot open config: ", err)
+		return
 	}
+
+	if err := config.InitStore(); err != nil {
+		logrus.Error("Cannot init store")
+		return
+	}
+
 	http.ListenAndServe(":10000", router.MakeRouter())
 }

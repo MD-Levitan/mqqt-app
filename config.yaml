@@ -3,3 +3,7 @@ db:
   user:  "user"
   database: "postgres"
   ssl_mode : "false"
+mqqt:
+  protocol: "tcp"
+  ip:       "172.17.0.2"
+  port:     1883

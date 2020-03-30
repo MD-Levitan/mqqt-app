@@ -1,14 +1,18 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 
+	"github.com/gorilla/sessions"
 	"gopkg.in/yaml.v2"
 )
 
 var config *Config
+var store *sessions.FilesystemStore
 
 type DBConfig struct {
 	Host     string `yaml:"host"`
@@ -19,13 +23,20 @@ type DBConfig struct {
 }
 
 type WebConfig struct {
-	SessionKey string `yaml:"-"`
-	JWTSecret  string `yaml:"-"`
+	SessionKey   string `yaml:"-"`
+	CipherSecret string `yaml:"-"`
+}
+
+type MQQTConfig struct {
+	Protocol string `yaml:"protocol"`
+	IP       string `yaml:"ip"`
+	Port     uint16 `yaml:"port"`
 }
 
 type Config struct {
-	DB  DBConfig  `yaml:"db"`
-	Web WebConfig `yaml:"-"`
+	DB   DBConfig   `yaml:"db"`
+	Web  WebConfig  `yaml:"-"`
+	MQQT MQQTConfig `yaml:"mqqt"`
 }
 
 func makeConfig(appPath string, configName string) (*Config, error) {
@@ -43,7 +54,7 @@ func makeConfig(appPath string, configName string) (*Config, error) {
 	if config.Web.SessionKey, err = ReadSecret(appPath, "session_key"); err != nil {
 		return config, err
 	}
-	if config.Web.JWTSecret, err = ReadSecret(appPath, "jwt_secret"); err != nil {
+	if config.Web.CipherSecret, err = ReadSecret(appPath, "cipher_key"); err != nil {
 		return config, err
 	}
 	return config, err
@@ -53,14 +64,14 @@ func GetConfig() *Config {
 	return config
 }
 
-func InitConfig(configName string) (*Config, error) {
+func InitConfig(configName string) error {
 	var err error
 	if config == nil {
 		var applicationPath string
 		applicationPath, err = os.Getwd()
 		config, err = makeConfig(applicationPath, configName)
 	}
-	return config, err
+	return err
 }
 
 func ReadSecret(secretPath string, secretName string) (string, error) {
@@ -71,9 +82,22 @@ func ReadSecret(secretPath string, secretName string) (string, error) {
 	}
 }
 
-//func Test()  {
-//	config := Config{DB:DBConfig{User:"user", Host:"host", SSLMode:"false", Database:"db"}}
-//	res, err := yaml.Marshal(&config)
-//	fmt.Printf("%s", res)
-//	fmt.Printf("%s", err)
-//}
+func GetStore() *sessions.FilesystemStore {
+	return store
+}
+
+func InitStore() error {
+
+	if config == nil {
+		return fmt.Errorf("congfig is not init")
+	}
+	/* TODO: Change second key */
+	store = sessions.NewFilesystemStore("./session", []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
+
+	store.Options = &sessions.Options{
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   3600,
+	}
+	return nil
+}
