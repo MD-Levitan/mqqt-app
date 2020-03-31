@@ -1,6 +1,9 @@
 package models
 
 import (
+	"fmt"
+	"math/rand"
+
 	"github.com/MD-Levitan/mqqt-app/config"
 	"github.com/sirupsen/logrus"
 )
@@ -8,6 +11,7 @@ import (
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	ID       string `json:"ID"`
 }
 
 type UserContext struct {
@@ -55,6 +59,7 @@ func InitGlobalContainer() {
 }
 
 func NewUserContext(user User) *UserContext {
+	user.ID = fmt.Sprintf("mqtt-app-%d", rand.Int63())
 	weather := &Weather{}
 	subsciber := NewMQTTSubscriberConfig(user, UserTopics[:], weather)
 
@@ -69,26 +74,26 @@ func NewUserContext(user User) *UserContext {
 		return nil
 	}
 	//go goMQTT(subsciber)
-	globalContainer.MQTTContainer[uctx.User.Username] = subsciber
-	globalContainer.WeatherContainer[uctx.User.Username] = weather
+	globalContainer.MQTTContainer[uctx.User.ID] = subsciber
+	globalContainer.WeatherContainer[uctx.User.ID] = weather
 	return uctx
 }
 
 func DeleteUserContext(uctx *UserContext) {
 	/* Remove Weather */
-	delete(globalContainer.WeatherContainer, uctx.User.Username)
+	delete(globalContainer.WeatherContainer, uctx.User.ID)
 
 	/* Remove Subcriber */
-	if subsciber, ok := globalContainer.MQTTContainer[uctx.User.Username]; !ok || subsciber == nil {
+	if subsciber, ok := globalContainer.MQTTContainer[uctx.User.ID]; !ok || subsciber == nil {
 		return
 	} else {
 		subsciber.Client.Disconnect(0)
-		delete(globalContainer.MQTTContainer, uctx.User.Username)
+		delete(globalContainer.MQTTContainer, uctx.User.ID)
 	}
 }
 
-func (ctx UserContext) GetWeather() *Weather {
-	if weather, ok := globalContainer.WeatherContainer[ctx.User.Password]; !ok {
+func (uctx UserContext) GetWeather() *Weather {
+	if weather, ok := globalContainer.WeatherContainer[uctx.User.ID]; !ok {
 		return nil
 	} else {
 		return weather

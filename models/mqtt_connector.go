@@ -24,7 +24,8 @@ func NewMQTTSubscriber(protocol string, host string, port uint16, user User, top
 	options := MQTT.NewClientOptions().AddBroker(fmt.Sprintf("%s://%s:%d", protocol, host, port))
 	logrus.Printf(fmt.Sprintf("%s://%s:%d", protocol, host, port))
 	// Add User Settings
-	options.SetClientID(user.Username)
+	options.SetClientID(user.ID)
+	options.SetUsername(user.Username)
 	options.SetPassword(user.Password)
 
 	options.SetDefaultPublishHandler(handler)

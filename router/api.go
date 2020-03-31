@@ -116,6 +116,7 @@ func userHumidityHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWr
 		return err
 	}
 	context := getUserContext(session)
+
 	if context != nil {
 		if weather := context.GetWeather(); weather != nil {
 			enc.Encode(&models.HumidityData{weather.HumidityData})
