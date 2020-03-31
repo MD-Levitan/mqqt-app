@@ -15,7 +15,7 @@ type MQTTSubscriber struct {
 	Client  MQTT.Client
 }
 
-func NewMQTTSubscriber(protocol string, host string, port uint16, clientID string, topics []TopicType, weather *Weather) *MQTTSubscriber {
+func NewMQTTSubscriber(protocol string, host string, port uint16, user User, topics []TopicType, weather *Weather) *MQTTSubscriber {
 	var handler MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 		logrus.Printf("MSG: %s\n", msg.Payload())
 		weather.UpdateWeatherByTopic(StringToTopic(msg.Topic()), msg.Payload())
@@ -23,7 +23,10 @@ func NewMQTTSubscriber(protocol string, host string, port uint16, clientID strin
 
 	options := MQTT.NewClientOptions().AddBroker(fmt.Sprintf("%s://%s:%d", protocol, host, port))
 	logrus.Printf(fmt.Sprintf("%s://%s:%d", protocol, host, port))
-	options.SetClientID(clientID)
+	// Add User Settings
+	options.SetClientID(user.Username)
+	options.SetPassword(user.Password)
+
 	options.SetDefaultPublishHandler(handler)
 
 	options.OnConnect = func(c MQTT.Client) {
@@ -55,7 +58,7 @@ func goMQTT(subscriber *MQTTSubscriber) {
 	}
 }
 
-func NewMQTTSubscriberConfig(clientID string, topics []TopicType, weather *Weather) *MQTTSubscriber {
+func NewMQTTSubscriberConfig(user User, topics []TopicType, weather *Weather) *MQTTSubscriber {
 	conf := config.GetConfig()
-	return NewMQTTSubscriber(conf.MQQT.Protocol, conf.MQQT.IP, conf.MQQT.Port, clientID, topics, weather)
+	return NewMQTTSubscriber(conf.MQQT.Protocol, conf.MQQT.IP, conf.MQQT.Port, user, topics, weather)
 }

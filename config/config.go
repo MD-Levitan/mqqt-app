@@ -3,24 +3,18 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 
-	"github.com/boltdb/bolt"
 	"github.com/gorilla/sessions"
-	"github.com/skynet0590/boltstore/store"
-	"github.com/yosssi/boltstore/reaper"
 	"gopkg.in/yaml.v2"
 )
 
 var config *Config
-var db *bolt.DB
-var session_store *store.Store
+var session_store *sessions.FilesystemStore
 
 type DBConfig struct {
-	Database string      `yaml:"file"`
-	Password os.FileMode `yaml:"filemod"`
+	Database string `yaml:"file"`
 }
 
 type WebConfig struct {
@@ -80,23 +74,7 @@ func ReadSecret(secretPath string, secretName string) (string, error) {
 	}
 }
 
-func GetDB() *bolt.DB {
-	return db
-}
-
-func InitDB(path string, mode os.FileMode) error {
-	if db_, err := bolt.Open(path, mode, nil); err != nil {
-		return err
-	} else {
-		db = db_
-
-	}
-	defer db.Close()
-	// Invoke a reaper which checks and removes expired sessions periodically.
-	defer reaper.Quit(reaper.Run(db, reaper.Options{}))
-}
-
-func GetStore() *store.Store {
+func GetStore() *sessions.FilesystemStore {
 	return session_store
 }
 
@@ -106,11 +84,6 @@ func InitStore() error {
 		return fmt.Errorf("congfig is not init")
 	}
 	/* TODO: Change second key */
-	session_store = store.Store(db,
-		&sessions.Options{
-			HttpOnly: true,
-			SameSite: http.SameSiteStrictMode,
-			MaxAge:   60},
-		[]byte(config.Web.SessionKey))
+	session_store = sessions.NewFilesystemStore(config.DB.Database, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
 	return nil
 }

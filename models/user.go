@@ -1,5 +1,10 @@
 package models
 
+import (
+	"github.com/MD-Levitan/mqqt-app/config"
+	"github.com/sirupsen/logrus"
+)
+
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -51,27 +56,34 @@ func InitGlobalContainer() {
 
 func NewUserContext(user User) *UserContext {
 	weather := &Weather{}
+	subsciber := NewMQTTSubscriberConfig(user, UserTopics[:], weather)
+
+	password, err := encrypt([]byte(config.GetConfig().Web.SessionKey), []byte(user.Password))
+	if err != nil {
+		logrus.Error(err)
+		return nil
+	}
+	user.Password = string(password)
 	uctx := &UserContext{User: user}
-	subsciber := NewMQTTSubscriberConfig("user", UserTopics[:], weather)
 	if subsciber == nil {
 		return nil
 	}
 	//go goMQTT(subsciber)
-	globalContainer.MQTTContainer[uctx.User.Password] = subsciber
-	globalContainer.WeatherContainer[uctx.User.Password] = weather
+	globalContainer.MQTTContainer[uctx.User.Username] = subsciber
+	globalContainer.WeatherContainer[uctx.User.Username] = weather
 	return uctx
 }
 
 func DeleteUserContext(uctx *UserContext) {
 	/* Remove Weather */
-	delete(globalContainer.WeatherContainer, uctx.User.Password)
+	delete(globalContainer.WeatherContainer, uctx.User.Username)
 
 	/* Remove Subcriber */
-	if subsciber, ok := globalContainer.MQTTContainer[uctx.User.Password]; !ok || subsciber == nil {
+	if subsciber, ok := globalContainer.MQTTContainer[uctx.User.Username]; !ok || subsciber == nil {
 		return
 	} else {
 		subsciber.Client.Disconnect(0)
-		delete(globalContainer.MQTTContainer, uctx.User.Password)
+		delete(globalContainer.MQTTContainer, uctx.User.Username)
 	}
 }
 
@@ -85,10 +97,10 @@ func (ctx UserContext) GetWeather() *Weather {
 
 /* TODO:
  *	1. Rewrite json API - DONE
- *	2. Rework&change storage
- *  3. Remove Key
+ *	2. Rework&change storage - DELAYED(check of user with same names, checkin expiration)
+ *  3. Remove Key - IN WORK
  *  4. Add secure MQTT
  *  5. Add logout - DONE
- *	6. Add destroying of objects
+ *	6. Add destroying of objects - PARTIALY DONE
  *	7. Add more api and admin, healt
  */

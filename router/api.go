@@ -32,7 +32,6 @@ func userStatusHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWrit
 }
 
 func loginHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
-	conf := config.GetConfig()
 	session, err := config.GetStore().Get(r, "Rcookie")
 	if err != nil {
 		return err
@@ -43,12 +42,6 @@ func loginHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r
 		return err
 	}
 
-	password, err := encrypt([]byte(conf.Web.SessionKey), []byte(user.Password))
-	if err != nil {
-		logrus.Error(err)
-		return err
-	}
-	user.Password = string(password)
 	ctx := models.NewUserContext(user)
 	if ctx == nil {
 		w.WriteHeader(http.StatusInternalServerError)

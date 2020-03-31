@@ -1,14 +1,8 @@
 package router
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -59,7 +53,6 @@ func authorizeByCookie(next http.Handler) http.Handler {
 		}
 
 		context := getUserContext(session)
-		logrus.Error(context)
 		if context == nil {
 			session.AddFlash("You don't have access!")
 			err = session.Save(r, w)
@@ -74,43 +67,6 @@ func authorizeByCookie(next http.Handler) http.Handler {
 func authHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
 	fmt.Printf("authHandler")
 	return fmt.Errorf("test error")
-}
-
-func encrypt(key, text []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	b := base64.StdEncoding.EncodeToString(text)
-	ciphertext := make([]byte, aes.BlockSize+len(b))
-	iv := ciphertext[:aes.BlockSize]
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	cfb := cipher.NewCFBEncrypter(block, iv)
-	cfb.XORKeyStream(ciphertext[aes.BlockSize:], []byte(b))
-	return ciphertext, nil
-}
-
-func decrypt(key, text []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, err
-	}
-	if len(text) < aes.BlockSize {
-		return nil, errors.New("ciphertext too short")
-	}
-	iv := text[:aes.BlockSize]
-	text = text[aes.BlockSize:]
-	cfb := cipher.NewCFBDecrypter(block, iv)
-	cfb.XORKeyStream(text, text)
-	data, err := base64.StdEncoding.DecodeString(string(text))
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
 }
 
 // func createJWT(user models.User) (string, error) {
