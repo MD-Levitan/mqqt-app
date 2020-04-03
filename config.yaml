@@ -1,5 +1,5 @@
 db:
-  file:  "session/"
+  file:  "sessions.db"
   filemod:  0600
 mqqt:
   protocol: "tcp"

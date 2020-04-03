@@ -6,12 +6,14 @@ import (
 	"os"
 	"path"
 
-	"github.com/gorilla/sessions"
+	"github.com/MD-Levitan/bboltstore/store"
+	"go.etcd.io/bbolt"
 	"gopkg.in/yaml.v2"
 )
 
 var config *Config
-var session_store *sessions.FilesystemStore
+var session_store *store.Store
+var db *bbolt.DB
 
 type DBConfig struct {
 	Database string `yaml:"file"`
@@ -74,7 +76,7 @@ func ReadSecret(secretPath string, secretName string) (string, error) {
 	}
 }
 
-func GetStore() *sessions.FilesystemStore {
+func GetStore() *store.Store {
 	return session_store
 }
 
@@ -83,7 +85,21 @@ func InitStore() error {
 	if config == nil {
 		return fmt.Errorf("congfig is not init")
 	}
+
+	db, err := bbolt.Open(config.DB.Database, 0666, nil)
+	if err != nil {
+		fmt.Printf("%s", config.DB.Database)
+		return err
+	}
+	defer db.Close()
+
 	/* TODO: Change second key */
-	session_store = sessions.NewFilesystemStore(config.DB.Database, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
+	session_store, err = store.New(db, store.Config{}, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
+	if err != nil {
+		fmt.Printf("1")
+		return err
+	}
+
+	//sessions.NewFilesystemStore(config.DB.Database, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
 	return nil
 }
