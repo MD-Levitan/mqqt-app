@@ -3,8 +3,7 @@ module github.com/MD-Levitan/mqqt-app
 go 1.13
 
 require (
-	github.com/MD-Levitan/bboltstore v0.0.0-20200403161846-05ebd9ab5677
-	github.com/boltdb/bolt v1.3.1
+	github.com/MD-Levitan/bboltstore v0.0.0-20200404183727-50a4587ecd4b
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/sessions v1.2.0

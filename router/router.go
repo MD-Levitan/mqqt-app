@@ -1,18 +1,20 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 )
 
 func MakeRouter() *mux.Router {
 	r := mux.NewRouter()
-	//makeStaticRouter(r)
-	//makeMusicRouter(r)
-	makeWebRouter(r)
+	makeStaticRouter(r)
+	makeWebViewRouter(r)
+	makeApiRouter(r)
 	return r
 }
 
-func makeWebRouter(mainRouter *mux.Router) {
+func makeApiRouter(mainRouter *mux.Router) {
 	apiRouter := mainRouter.PathPrefix("/api/v1").Subrouter()
 	apiRouter.Use(jsonResponseMiddleware)
 	//apiRouter.HandleFunc("/health", JSONHandler(statusHandler)).Methods("GET")
@@ -33,4 +35,20 @@ func makeWebRouter(mainRouter *mux.Router) {
 	adminRouter.HandleFunc("/info", JSONHandler(authHandler)).Methods("GET")
 	adminRouter.HandleFunc("/work", JSONHandler(authHandler)).Methods("GET")
 
+}
+
+func makeStaticRouter(mainRouter *mux.Router) {
+	mainRouter.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+}
+
+func makeWebViewRouter(mainRouter *mux.Router) {
+	webRouter := mainRouter.PathPrefix("/").Subrouter()
+
+	webRouter.HandleFunc("/login", loginWebHandler).Methods("GET")
+
+	webAuthRouter := webRouter.PathPrefix("").Subrouter()
+	//webAuthRouter.Use(authorizeByCookie)
+	//User webView
+	webAuthRouter.HandleFunc("/", viewWebHandler).Methods("GET")
+	webAuthRouter.HandleFunc("/logout", JSONHandler(logoutHandler)).Methods("GET")
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"net/http"
 
+	"github.com/MD-Levitan/bboltstore/store"
 	"github.com/MD-Levitan/mqqt-app/config"
 	"github.com/MD-Levitan/mqqt-app/models"
 	"github.com/MD-Levitan/mqqt-app/router"
@@ -33,10 +34,16 @@ func main() {
 		return
 	}
 
-	if err := config.InitStore(); err != nil {
-		logrus.Error("Cannot init store")
+	if err := config.InitTmpl(); err != nil {
+		logrus.Error("Cannot init templates: ", err)
 		return
 	}
+
+	if err := config.InitStore(); err != nil {
+		logrus.Error("Cannot init store: ", err)
+		return
+	}
+	defer store.Checker(config.GetStore())
 
 	http.ListenAndServe(":10000", router.MakeRouter())
 }

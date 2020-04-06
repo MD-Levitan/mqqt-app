@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <title>Smart House</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="stylesheet" href="/public/css/main.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="shortcut icon" href="/public/img/favicon.png" type="image/png"> -->
+    <script type="text/javascript" src="static/js/Chart.js"></script>
+    <script type="text/javascript" src="static/js/api.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="container">
+                <div class="row">
+                    <!-- <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <h1><a href="/login" class="hover-color"></a></h1>
+                    </div> -->
+                </div>
+            </div>
+        </header>
+        <!-- <div class="content">
+            <div class="background-color admin-background-color admin-page-position height-style">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <ul>
+                                <li>
+                                    <h3>Welcome to Smart House App!</h3>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <footer>
+
+            </footer>
+        </div> -->
+
+        <!-- <canvas id="humidity" width="200" height="200"></canvas>
+        <canvas id="temperature" width="200" height="200"></canvas>
+        <canvas id="pressure" width="200" height="200"></canvas> -->
+        <canvas id="weather" width="100"></canvas>
+        <script>
+            var humidity = getHumidity();
+            var temperature = getTemperature();
+            var pressure = getPressure();
+
+            var ctx = document.getElementById('weather').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: generateTime(humidity.length),
+                    datasets: [{
+                        label: "Humidity",
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        //borderColor: 'rgba(255, 99, 132, 0.2)',
+                        data: humidity,
+
+                    },
+                    {
+                        label: "Temperature",
+                        backgroundColor: 'rgba(12, 199, 132, 0.2)',
+                        //borderColor: 'rgba(12, 199, 132, 0.2)',
+                        data: temperature,
+
+                    },
+                    {
+                        label: "Pressure",
+                        backgroundColor: 'rgba(100, 99, 255, 0.2)',
+                        //borderColor: 'rgba(100, 99, 255, 0.2)',
+                        data: pressure,
+
+                    },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Smart House App'
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Value'
+                            }
+                        }]
+                    }
+                }
+            });
+        </script>
+
+    </div>
+</body>
+
+</html>

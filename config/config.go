@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"os"
 	"path"
@@ -14,6 +15,7 @@ import (
 var config *Config
 var session_store *store.Store
 var db *bbolt.DB
+var tmpl *template.Template
 
 type DBConfig struct {
 	Database string `yaml:"file"`
@@ -86,15 +88,16 @@ func InitStore() error {
 		return fmt.Errorf("congfig is not init")
 	}
 
-	db, err := bbolt.Open(config.DB.Database, 0666, nil)
-	if err != nil {
-		fmt.Printf("%s", config.DB.Database)
-		return err
-	}
-	defer db.Close()
+	// db, err := bbolt.Open(config.DB.Database, 0666, nil)
+	// if err != nil {
+	// 	fmt.Printf("%s", config.DB.Database)
+	// 	return err
+	// }
+	// defer db.Close()
 
 	/* TODO: Change second key */
-	session_store, err = store.New(db, store.Config{}, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
+	var err error
+	session_store, err = store.NewStoreWithDB(config.DB.Database, store.Config{}, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
 	if err != nil {
 		fmt.Printf("1")
 		return err
@@ -102,4 +105,17 @@ func InitStore() error {
 
 	//sessions.NewFilesystemStore(config.DB.Database, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
 	return nil
+}
+
+func InitTmpl() error {
+	if t, err := template.ParseGlob("templates/*.html"); err != nil {
+		return err
+	} else {
+		tmpl = t
+		return nil
+	}
+}
+
+func GetTmpl() *template.Template {
+	return tmpl
 }
