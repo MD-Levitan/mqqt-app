@@ -1,12 +1,3 @@
-function login(username, password) {
-    var req = new XMLHttpRequest();
-    var creds = { "password": password, "username": username };
-    req.open("POST", "/api/v1/login", false);
-    req.send(JSON.stringify(creds));
-    console.log(req.responseText);
-    return req.status;
-}
-
 function getHumidity() {
     var req = new XMLHttpRequest();
     req.open("GET", "/api/v1/humidity", false);
@@ -32,11 +23,18 @@ function getTemperature() {
 }
 
 function generateTime(n) {
+    if (n === null) {
+        n = 0;
+    } else {
+        n = n.length;
+    }
+    console.log(n);
     var today = new Date();
     var time = today.getHours() + today.getMinutes() + today.getSeconds();
     var times = [];
     for (let index = n - 1; index >= 0; index--) {
         times.push(time - 5 * index);
     }
+    console.log(times);
     return times;
 }

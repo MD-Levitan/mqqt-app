@@ -56,7 +56,7 @@ func loginHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r
 	return nil
 }
 
-func logoutHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
+func logout(w http.ResponseWriter, r *http.Request) (err error) {
 	session, err := config.GetStore().Get(r, "Rcookie")
 	if err != nil || session.IsNew {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -73,6 +73,11 @@ func logoutHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, 
 		return err
 	}
 	return nil
+}
+
+func logoutHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
+	result := logout(w, r)
+	return result
 }
 
 func userTemperatureHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {

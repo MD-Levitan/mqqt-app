@@ -47,8 +47,8 @@ func makeWebViewRouter(mainRouter *mux.Router) {
 	webRouter.HandleFunc("/login", loginWebHandler).Methods("GET")
 
 	webAuthRouter := webRouter.PathPrefix("").Subrouter()
-	//webAuthRouter.Use(authorizeByCookie)
+	webAuthRouter.Use(authorizeByCookieWeb)
 	//User webView
 	webAuthRouter.HandleFunc("/", viewWebHandler).Methods("GET")
-	webAuthRouter.HandleFunc("/logout", JSONHandler(logoutHandler)).Methods("GET")
+	webAuthRouter.HandleFunc("/logout", logoutWebHandler).Methods("GET")
 }

@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- <link rel="stylesheet" href="/public/css/main.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="shortcut icon" href="/public/img/favicon.png" type="image/png"> -->
+    <link rel="stylesheet" href="/static/css/main.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/png">
     <script type="text/javascript" src="static/js/Chart.js"></script>
     <script type="text/javascript" src="static/js/api.js"></script>
 </head>
@@ -18,103 +18,185 @@
         <header>
             <div class="container">
                 <div class="row">
-                    <!-- <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        <h1><a href="/login" class="hover-color"></a></h1>
-                    </div> -->
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <h1><a href="/logout" class="hover-color">Logout</a></h1>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <ul>
+                            <li><a href="/temperature" class="hover-color">Temperature</a></li>
+                            <li><a href="/humidity" class="hover-color">Humidity</a></li>
+                            <li><a href="/pressure" class="hover-color">Pressure</a></li>
+                            <li><a href="/lighting" class="hover-color">Lighting</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </header>
-        <!-- <div class="content">
+
+        <div class="content">
             <div class="background-color admin-background-color admin-page-position height-style">
                 <div class="container">
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <ul>
-                                <li>
-                                    <h3>Welcome to Smart House App!</h3>
-                                </li>
-                            </ul>
-                        </div>
+
+                    <div class="chart-container" style="position: relative; height:25vh; width:35vw">
+                        <ul>
+                            <li><canvas id="temperature"></canvas></li>
+                            <li><canvas id="humidity"></canvas></li>
+                            <li><canvas id="pressure"></canvas></li>
+                        </ul>
                     </div>
 
+                    <script>
+                        var humidity = getHumidity();
+                        var temperature = getTemperature();
+                        var pressure = getPressure();
+
+                        var ctxT = document.getElementById('temperature').getContext('2d');
+                        var myT = new Chart(ctxT, {
+                            type: 'line',
+                            data: {
+                                labels: generateTime(temperature),
+                                datasets: [
+                                    {
+                                        label: "Temperature",
+                                        backgroundColor: 'rgba(12, 199, 132, 0.2)',
+                                        //borderColor: 'rgba(12, 199, 132, 0.2)',
+                                        data: temperature,
+
+                                    },
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: true,
+                                    text: 'Smart House - Temperature'
+                                },
+                                tooltips: {
+                                    mode: 'index',
+                                    intersect: false,
+                                },
+                                hover: {
+                                    mode: 'nearest',
+                                    intersect: true
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Time'
+                                        }
+                                    }],
+                                    yAxes: [{
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Value'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+
+                        var ctxH = document.getElementById('humidity').getContext('2d');
+                        var myH = new Chart(ctxH, {
+                            type: 'line',
+                            data: {
+                                labels: generateTime(humidity),
+                                datasets: [{
+                                    label: "Humidity",
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    //borderColor: 'rgba(255, 99, 132, 0.2)',
+                                    data: humidity,
+
+                                },
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: true,
+                                    text: 'Smart House App - Humidity'
+                                },
+                                tooltips: {
+                                    mode: 'index',
+                                    intersect: false,
+                                },
+                                hover: {
+                                    mode: 'nearest',
+                                    intersect: true
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Time'
+                                        }
+                                    }],
+                                    yAxes: [{
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Value'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+
+                        var ctxP = document.getElementById('pressure').getContext('2d');
+                        var myP = new Chart(ctxP, {
+                            type: 'line',
+                            data: {
+                                labels: generateTime(pressure),
+                                datasets: [
+                                    {
+                                        label: "Pressure",
+                                        backgroundColor: 'rgba(100, 99, 255, 0.2)',
+                                        //borderColor: 'rgba(100, 99, 255, 0.2)',
+                                        data: pressure,
+
+                                    },
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: true,
+                                    text: 'Smart House App - Pressure'
+                                },
+                                tooltips: {
+                                    mode: 'index',
+                                    intersect: false,
+                                },
+                                hover: {
+                                    mode: 'nearest',
+                                    intersect: true
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Time'
+                                        }
+                                    }],
+                                    yAxes: [{
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Value'
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
                 </div>
-
             </div>
-            <footer>
 
-            </footer>
-        </div> -->
-
-        <!-- <canvas id="humidity" width="200" height="200"></canvas>
-        <canvas id="temperature" width="200" height="200"></canvas>
-        <canvas id="pressure" width="200" height="200"></canvas> -->
-        <canvas id="weather" width="100"></canvas>
-        <script>
-            var humidity = getHumidity();
-            var temperature = getTemperature();
-            var pressure = getPressure();
-
-            var ctx = document.getElementById('weather').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: generateTime(humidity.length),
-                    datasets: [{
-                        label: "Humidity",
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        //borderColor: 'rgba(255, 99, 132, 0.2)',
-                        data: humidity,
-
-                    },
-                    {
-                        label: "Temperature",
-                        backgroundColor: 'rgba(12, 199, 132, 0.2)',
-                        //borderColor: 'rgba(12, 199, 132, 0.2)',
-                        data: temperature,
-
-                    },
-                    {
-                        label: "Pressure",
-                        backgroundColor: 'rgba(100, 99, 255, 0.2)',
-                        //borderColor: 'rgba(100, 99, 255, 0.2)',
-                        data: pressure,
-
-                    },
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Smart House App'
-                    },
-                    tooltips: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    hover: {
-                        mode: 'nearest',
-                        intersect: true
-                    },
-                    scales: {
-                        xAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Time'
-                            }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Value'
-                            }
-                        }]
-                    }
-                }
-            });
-        </script>
+        </div>
 
     </div>
 </body>

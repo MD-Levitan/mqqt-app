@@ -64,6 +64,28 @@ func authorizeByCookie(next http.Handler) http.Handler {
 	})
 }
 
+func authorizeByCookieWeb(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		session, err := config.GetStore().Get(r, "Rcookie")
+		if err != nil || session.IsNew {
+			w.WriteHeader(http.StatusUnauthorized)
+			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			return
+		}
+
+		context := getUserContext(session)
+		if context == nil {
+			session.AddFlash("You don't have access!")
+			err = session.Save(r, w)
+			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func authHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
 	fmt.Printf("authHandler")
 	return fmt.Errorf("test error")
