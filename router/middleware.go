@@ -69,8 +69,7 @@ func authorizeByCookieWeb(next http.Handler) http.Handler {
 
 		session, err := config.GetStore().Get(r, "Rcookie")
 		if err != nil || session.IsNew {
-			w.WriteHeader(http.StatusUnauthorized)
-			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			redirectLoginHandler(w)
 			return
 		}
 
@@ -78,7 +77,7 @@ func authorizeByCookieWeb(next http.Handler) http.Handler {
 		if context == nil {
 			session.AddFlash("You don't have access!")
 			err = session.Save(r, w)
-			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			redirectLoginHandler(w)
 			return
 		}
 

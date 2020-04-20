@@ -50,5 +50,9 @@ func makeWebViewRouter(mainRouter *mux.Router) {
 	webAuthRouter.Use(authorizeByCookieWeb)
 	//User webView
 	webAuthRouter.HandleFunc("/", viewWebHandler).Methods("GET")
+	webAuthRouter.HandleFunc("/pressure", pressureWebHandler).Methods("GET")
+	webAuthRouter.HandleFunc("/temperature", temperatureWebHandler).Methods("GET")
+	webAuthRouter.HandleFunc("/humidity", humidityWebHandler).Methods("GET")
+	webAuthRouter.HandleFunc("/update", updateWebHandler).Methods("GET")
 	webAuthRouter.HandleFunc("/logout", logoutWebHandler).Methods("GET")
 }

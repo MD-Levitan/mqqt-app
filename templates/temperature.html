@@ -23,6 +23,7 @@
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                         <ul>
+                            <li><a href="/" class="hover-color">Dashboard</a></li>
                             <li><a href="/temperature" class="hover-color">Temperature</a></li>
                             <li><a href="/humidity" class="hover-color">Humidity</a></li>
                             <li><a href="/pressure" class="hover-color">Pressure</a></li>
@@ -37,23 +38,15 @@
             <div class="background-color admin-background-color admin-page-position height-style">
                 <div class="container">
 
-                    <div class="chart-container" style="position: relative; height:20vh; width:25vw">
+                    <div class="chart-container" style="position: relative; height:35vh; width:35vw">
                         <ul>
                             <li><canvas id="temperature"></canvas></li>
-                            <li><canvas id="humidity"></canvas></li>
-                            <li><canvas id="pressure"></canvas></li>
                         </ul>
                     </div>
 
                     <script>
                         var ctxT = document.getElementById('temperature').getContext('2d');
                         var myT = addTemperatureChart(ctxT);
-
-                        var ctxH = document.getElementById('humidity').getContext('2d');
-                        var myH = addHumidityChart(ctxH);
-
-                        var ctxP = document.getElementById('pressure').getContext('2d');
-                        var myP = addPressureChart(ctxP);
                     </script>
                 </div>
             </div>
