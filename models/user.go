@@ -49,6 +49,7 @@ func StringToTopic(str string) TopicType {
 type Container struct {
 	MQTTContainer    map[string]*MQTTSubscriber
 	WeatherContainer map[string]*Weather
+	UsersContainer   map[string]string
 }
 
 var globalContainer = Container{}
@@ -56,9 +57,16 @@ var globalContainer = Container{}
 func InitGlobalContainer() {
 	globalContainer.MQTTContainer = make(map[string]*MQTTSubscriber)
 	globalContainer.WeatherContainer = make(map[string]*Weather)
+	globalContainer.UsersContainer = make(map[string]string)
 }
 
 func NewUserContext(user User) *UserContext {
+	/* If Multiple Users is not allowed check all new users and delete old in case if such user exsit  */
+	if config.GetConfig().MQQT.MultipleUsers == false {
+		if userID, ok := globalContainer.UsersContainer[user.Username]; ok {
+			deleteUser(userID)
+		}
+	}
 	user.ID = fmt.Sprintf("mqtt-app-%d", rand.Int63())
 	weather := &Weather{}
 	subsciber := NewMQTTSubscriberConfig(user, UserTopics[:], weather)
@@ -73,23 +81,35 @@ func NewUserContext(user User) *UserContext {
 	if subsciber == nil {
 		return nil
 	}
-	//go goMQTT(subsciber)
+
 	globalContainer.MQTTContainer[uctx.User.ID] = subsciber
 	globalContainer.WeatherContainer[uctx.User.ID] = weather
+	if config.GetConfig().MQQT.MultipleUsers == false {
+		globalContainer.UsersContainer[user.Username] = uctx.User.ID
+	}
 	return uctx
 }
 
-func DeleteUserContext(uctx *UserContext) {
+func deleteUser(ID string) {
 	/* Remove Weather */
-	delete(globalContainer.WeatherContainer, uctx.User.ID)
+	delete(globalContainer.WeatherContainer, ID)
 
 	/* Remove Subcriber */
-	if subsciber, ok := globalContainer.MQTTContainer[uctx.User.ID]; !ok || subsciber == nil {
+	if subsciber, ok := globalContainer.MQTTContainer[ID]; !ok || subsciber == nil {
 		return
 	} else {
 		subsciber.Client.Disconnect(0)
-		delete(globalContainer.MQTTContainer, uctx.User.ID)
+		delete(globalContainer.MQTTContainer, ID)
 	}
+}
+
+func DeleteUserContext(uctx *UserContext) {
+	deleteUser(uctx.User.ID)
+}
+
+func (uctx UserContext) CheckUser() bool {
+	_, ok := globalContainer.MQTTContainer[uctx.User.ID]
+	return ok
 }
 
 func (uctx UserContext) GetWeather() *Weather {
@@ -101,11 +121,9 @@ func (uctx UserContext) GetWeather() *Weather {
 }
 
 /* TODO:
- *	1. Rewrite json API - DONE
  *	2. Rework&change storage - DELAYED(check of user with same names, checkin expiration)
  *  3. Remove Key - IN WORK
- *  4. Add secure MQTT
- *  5. Add logout - DONE
  *	6. Add destroying of objects - PARTIALY DONE
  *	7. Add more api and admin, healt
+ *  8. Rework UserContext
  */

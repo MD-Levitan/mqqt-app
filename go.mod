@@ -2,8 +2,10 @@ module github.com/MD-Levitan/mqqt-app
 
 go 1.13
 
+replace github.com/MD-Levitan/bboltstore => ../bboltstore
+
 require (
-	github.com/MD-Levitan/bboltstore v0.0.0-20200404183727-50a4587ecd4b
+	github.com/MD-Levitan/bboltstore v0.0.0-20200422144831-0823678cda2f
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/sessions v1.2.0

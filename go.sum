@@ -1,7 +1,5 @@
-github.com/MD-Levitan/bboltstore v0.0.0-20200403161846-05ebd9ab5677 h1:2G5M0guf5pmzW0VHxOIpRwhViWrthcNgbejF7MTvoxA=
-github.com/MD-Levitan/bboltstore v0.0.0-20200403161846-05ebd9ab5677/go.mod h1:pzkapp2Z1bAwOSW23T+q5TUfZdFMAZeAMJF0yj1+wGU=
-github.com/MD-Levitan/bboltstore v0.0.0-20200404183727-50a4587ecd4b h1:FINGHh0YyKrZynizGOC/bnCgNgjRrL44ZeW+zOQw8QA=
-github.com/MD-Levitan/bboltstore v0.0.0-20200404183727-50a4587ecd4b/go.mod h1:MOxECspYfCKbNiTiYkmTWy6mfzA2NiZA8dccg8rvglI=
+github.com/MD-Levitan/bboltstore v0.0.0-20200422144831-0823678cda2f h1:HIKvf1TDizN6b1C86ZNyH3TEx15+MTo4BXChUyZLKRA=
+github.com/MD-Levitan/bboltstore v0.0.0-20200422144831-0823678cda2f/go.mod h1:MOxECspYfCKbNiTiYkmTWy6mfzA2NiZA8dccg8rvglI=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

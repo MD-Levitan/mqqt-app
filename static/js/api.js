@@ -43,14 +43,16 @@ function updateChart(ctx, upd_func, timeout) {
     setInterval(function (ctx, upd_func) {
         data = upd_func();
         if (data !== null) {
-            ctx.labels.push(ctx.labels[ctx.labels.length - 1] + 5);
-            ctx.data.datasets[0].push(data);
+            ctx.data.labels.push(ctx.data.labels[ctx.data.labels.length - 1] + 5);
+            ctx.data.datasets.forEach((dataset) => {
+                dataset.data.push(data[data.length - 1]);
+            });
             ctx.update();
         }
     }, timeout, ctx, upd_func);
 }
 
-var updateTime = 5000000;
+var updateTime = 5000;
 
 function addTemperatureChart(ctx) {
     var data = getTemperature();
@@ -100,7 +102,7 @@ function addTemperatureChart(ctx) {
             }
         }
     });
-    //updateChart(chart, getTemperature, updateTime);
+    updateChart(chart, getTemperature, updateTime);
     return chart;
 }
 
@@ -152,7 +154,7 @@ function addPressureChart(ctx) {
             }
         }
     });
-    //updateChart(chart, getPressure, updateTime);
+    updateChart(chart, getPressure, updateTime);
     return chart;
 }
 
@@ -204,6 +206,6 @@ function addHumidityChart(ctx) {
             }
         }
     });
-    //updateChart(chart, getHumidity, updateTime);
+    updateChart(chart, getHumidity, updateTime);
     return chart;
 }

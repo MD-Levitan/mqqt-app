@@ -17,7 +17,7 @@ type MQTTSubscriber struct {
 
 func NewMQTTSubscriber(protocol string, host string, port uint16, user User, topics []TopicType, weather *Weather) *MQTTSubscriber {
 	var handler MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
-		logrus.Printf("MSG: %s\n", msg.Payload())
+		//logrus.Printf("MSG: %s\n", msg.Payload())
 		weather.UpdateWeatherByTopic(StringToTopic(msg.Topic()), msg.Payload())
 	}
 

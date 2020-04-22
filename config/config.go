@@ -27,9 +27,10 @@ type WebConfig struct {
 }
 
 type MQQTConfig struct {
-	Protocol string `yaml:"protocol"`
-	IP       string `yaml:"ip"`
-	Port     uint16 `yaml:"port"`
+	Protocol      string `yaml:"protocol"`
+	IP            string `yaml:"ip"`
+	Port          uint16 `yaml:"port"`
+	MultipleUsers bool   `yaml:"multiple"`
 }
 
 type Config struct {
@@ -88,16 +89,14 @@ func InitStore() error {
 		return fmt.Errorf("congfig is not init")
 	}
 
-	// db, err := bbolt.Open(config.DB.Database, 0666, nil)
-	// if err != nil {
-	// 	fmt.Printf("%s", config.DB.Database)
-	// 	return err
-	// }
-	// defer db.Close()
-
 	/* TODO: Change second key */
 	var err error
-	session_store, err = store.NewStoreWithDB(config.DB.Database, store.Config{}, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
+	var store_config = store.NewDefaultConfig()
+	store_config.SessionOptions.MaxAge = 60 * 30 // 30 minutes
+	store_config.DBOptions.FreeDB = true
+	store_config.ReaperOptions.StartRoutine = true
+
+	session_store, err = store.NewStoreWithDB(config.DB.Database, *store_config, []byte(config.Web.SessionKey), []byte(config.Web.SessionKey))
 	if err != nil {
 		fmt.Printf("1")
 		return err

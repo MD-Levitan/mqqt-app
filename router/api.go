@@ -32,7 +32,7 @@ func userStatusHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWrit
 }
 
 func loginHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
-	session, err := config.GetStore().Get(r, "Rcookie")
+	session, err := config.GetStore().New(r, "Rcookie")
 	if err != nil {
 		return err
 	}

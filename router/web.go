@@ -44,5 +44,5 @@ func logoutWebHandler(w http.ResponseWriter, r *http.Request) {
 
 func redirectLoginHandler(w http.ResponseWriter) {
 	w.Header().Set("Location", "/login")
-	w.WriteHeader(http.StatusMovedPermanently)
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }

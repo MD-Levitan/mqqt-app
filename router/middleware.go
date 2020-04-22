@@ -40,7 +40,18 @@ func getUserContext(s *sessions.Session) *models.UserContext {
 		logrus.Error("cannot get user context from session")
 		return nil
 	}
+	if !user.CheckUser() {
+		deleteUserContext(s, user)
+		return nil
+	}
 	return user
+}
+
+func deleteUserContext(s *sessions.Session, ctx *models.UserContext) {
+	models.DeleteUserContext(ctx)
+	delete(s.Values, "Context")
+	s.Options.MaxAge = -1
+
 }
 
 func authorizeByCookie(next http.Handler) http.Handler {
