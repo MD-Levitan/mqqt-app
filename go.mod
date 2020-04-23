@@ -2,7 +2,7 @@ module github.com/MD-Levitan/mqqt-app
 
 go 1.13
 
-replace github.com/MD-Levitan/bboltstore => ../bboltstore
+//replace github.com/MD-Levitan/bboltstore => ../bboltstore
 
 require (
 	github.com/MD-Levitan/bboltstore v0.0.0-20200422144831-0823678cda2f
