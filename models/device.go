@@ -40,12 +40,12 @@ type Device struct {
 
 type UDevice struct {
 	Info   string `json:"info"`
-	Status uint8  `json:"status"`
+	Status string `json:"status"`
 }
 
 type ADevice struct {
 	Info    string  `json:"info"`
-	Status  uint8   `json:"status"`
+	Status  string  `json:"status"`
 	Time    uint32  `json:"time"`
 	Battery float32 `json:"battery"`
 	Model   uint8   `json:"model"`
@@ -56,13 +56,27 @@ type DeviceContainer struct {
 	Admin *ADevice `json:"adev"`
 }
 
+func statusToStr(status Status) string {
+	switch status.Status {
+	case 0:
+		return "Disconnect"
+	case 1:
+		return "Connect"
+	case 2:
+		return "Re-connecting"
+	default:
+		return "Undefiend"
+	}
+}
+
 func ConvertDevice(device Device) *DeviceContainer {
 	fmt.Printf("Get device %v\n", device)
 	container := &DeviceContainer{User: nil, Admin: nil}
-	if device.Admin.Info == "1" {
-		container.User = &UDevice{Info: device.User.Info, Status: device.Status.Status}
-	} else {
-		container.Admin = &ADevice{Info: device.Admin.Info, Status: device.Status.Status,
+	if device.User.Info != "" {
+		container.User = &UDevice{Info: device.User.Info, Status: statusToStr(device.Status)}
+	}
+	if device.Time.Time != 0 {
+		container.Admin = &ADevice{Info: device.Admin.Info, Status: statusToStr(device.Status),
 			Time: device.Time.Time, Battery: device.Battery.Battery, Model: device.Model.Model,
 		}
 	}

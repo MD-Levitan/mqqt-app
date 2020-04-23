@@ -44,11 +44,31 @@
             <div class="menu">
 
                 <div title="Firmware versions of sensors">
-                    <input type="checkbox" id="sensor1" name="sensor1" value="sensor1">
+                    <input type="radio" id="sensor-version" name="sensor-version" value="sensor1">
                     <label for="sensor1"> <a href="/static/sensors/sensor1">sensor1</a> </label><br>
-                    <input type="checkbox" id="sensor2" name="sensor2" value="sensor2">
+                    <input type="radio" id="sensor-version" name="sensor-version" value="sensor2">
                     <label for="sensor2"> <a href="/static/sensors/sensor2">sensor2</a> </label><br>
+                    <div class="container-login-form-btn m-t-17">
+                        <button class="login-form-btn" id="update">
+                            Upload New Firmware
+                        </button>
+                    </div>
                 </div>
+                <script>
+                    window.addEventListener("load", function () {
+                        let radio = document.getElementById("sensor-version");
+                        let update = document.getElementById("update");
+
+                        update.addEventListener("click", function (event) {
+                            event.preventDefault();
+                            if (radio.value == "sensor1") {
+                                uploadFirmware("/static/sensors/sensor1");
+                            } else {
+                                uploadFirmware("/static/sensors/sensor2");
+                            }
+                        });
+                    });
+                </script>
             </div>
         </div>
     </div>
@@ -71,7 +91,7 @@
                 <hr>
                 <label>Work Time:</label><label id="time" name="time"></label>
                 <hr>
-                <label>Model:</label><label id="model" name="model"></label>
+                <label>Model Version:</label><label id="model" name="model"></label>
             </div>
 
             <script>
