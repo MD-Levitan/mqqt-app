@@ -80,6 +80,23 @@ func logoutHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, 
 	return result
 }
 
+func deviceHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
+	session, err := config.GetStore().Get(r, "Rcookie")
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return err
+	}
+	context := getUserContext(session)
+	if context != nil {
+		if device := context.GetDevice(); device != nil {
+			enc.Encode(models.ConvertDevice(*device))
+			return nil
+		}
+	}
+	w.WriteHeader(http.StatusForbidden)
+	return nil
+}
+
 func userTemperatureHandler(dec *json.Decoder, enc *json.Encoder, w http.ResponseWriter, r *http.Request) (err error) {
 	session, err := config.GetStore().Get(r, "Rcookie")
 	if err != nil {

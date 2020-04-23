@@ -30,10 +30,7 @@ func makeApiRouter(mainRouter *mux.Router) {
 	authRouter.HandleFunc("/humidity", JSONHandler(userHumidityHandler)).Methods("GET")
 	authRouter.HandleFunc("/weather", JSONHandler(userWeatherHandler)).Methods("GET")
 
-	adminRouter := authRouter.PathPrefix("/admin").Subrouter()
-	adminRouter.HandleFunc("/battery", JSONHandler(authHandler)).Methods("GET")
-	adminRouter.HandleFunc("/info", JSONHandler(authHandler)).Methods("GET")
-	adminRouter.HandleFunc("/work", JSONHandler(authHandler)).Methods("GET")
+	authRouter.HandleFunc("/device", JSONHandler(deviceHandler)).Methods("GET")
 
 }
 
@@ -53,6 +50,6 @@ func makeWebViewRouter(mainRouter *mux.Router) {
 	webAuthRouter.HandleFunc("/pressure", pressureWebHandler).Methods("GET")
 	webAuthRouter.HandleFunc("/temperature", temperatureWebHandler).Methods("GET")
 	webAuthRouter.HandleFunc("/humidity", humidityWebHandler).Methods("GET")
-	webAuthRouter.HandleFunc("/update", updateWebHandler).Methods("GET")
+	webAuthRouter.HandleFunc("/admin", adminWebHandler).Methods("GET")
 	webAuthRouter.HandleFunc("/logout", logoutWebHandler).Methods("GET")
 }

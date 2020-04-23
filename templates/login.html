@@ -9,24 +9,40 @@
     <meta name="author" content="">
     <link rel="stylesheet" href="/static/css/main.css" type="text/css" media="screen" charset="utf-8" />
     <link rel="shortcut icon" href="/static/img/favicon.png" type="image/png">
-    <script type="text/javascript" src="static/js/api.js"></script>
+    <script type="text/javascript" src="/static/js/api.js"></script>
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="content">
-            <div class="main-background"></div>
-            <div class="background-color bike-front-style">
+    <div class="limiter">
+        <div class="container-login" style="background-image: url('/static/img/weather.gif');">
+            <div class="wrap-login p-t-50 p-b-90">
+                <form class="login-form validate-form flex-sb flex-w" id="login_form">
+                    <span class="login-form-title p-b-51">
+                        Welcome
+                    </span>
 
-                <form id="login_form">
-                    <p class="login-name-block">Welcome!</p>
-                    <fieldset>
-                        <p><input type="text" name="username" required value="" pattern="[A-Za-z0-9]{5,}"
-                                title="Five or more characters(A-Z,a-z,0-9)" placeholder="Username"></p>
-                        <p><input type="password" name="password" required value="" placeholder="Password"></p>
-                        <p><label class="error-label" id="error"></label></p>
-                        <p class="login-button"><input type="submit" name="login" value="Login"></p>
-                    </fieldset>
+                    <div class="wrap-input" data-validate="Username is required">
+                        <input class="input" type="text" name="username" placeholder="Username">
+                        <span class="focus-input"></span>
+                    </div>
+
+
+                    <div class="wrap-input" data-validate="Password is required">
+                        <input class="input" type="password" name="password" placeholder="Password">
+                        <span class="focus-input"></span>
+                    </div>
+
+                    <div class="wrap-label" data-validate="Password is required">
+                        <label class="error-label" id="error"></label>
+                    </div>
+
+
+                    <div class="container-login-form-btn m-t-17">
+                        <button class="login-form-btn">
+                            Login
+                        </button>
+                    </div>
+
                 </form>
 
                 <script>
@@ -39,7 +55,7 @@
                             var creds = { "password": form.elements["password"].value, "username": form.elements["username"].value };
                             req.open("POST", "/api/v1/login");
                             req.onreadystatechange = function () {
-                                if (req.readyState == 4 && req.status == 200) {
+                                if (req.status == 200) {
                                     window.location = "/";
                                 } else {
                                     error = document.getElementById("error")
@@ -51,10 +67,9 @@
                     });
                 </script>
 
-                <footer>
-
-                </footer>
             </div>
+        </div>
+    </div>
 </body>
 
 </html>

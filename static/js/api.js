@@ -2,7 +2,6 @@ function getHumidity() {
     var req = new XMLHttpRequest();
     req.open("GET", "/api/v1/humidity", false);
     req.send();
-    console.log(req.responseText);
     return JSON.parse(req.response).humidity;
 }
 
@@ -10,15 +9,20 @@ function getPressure() {
     var req = new XMLHttpRequest();
     req.open("GET", "/api/v1/pressure", false);
     req.send();
-    console.log(req.responseText);
     return JSON.parse(req.response).pressure;
+}
+
+function getDevice() {
+    var req = new XMLHttpRequest();
+    req.open("GET", "/api/v1/device", false);
+    req.send();
+    return JSON.parse(req.response);
 }
 
 function getTemperature() {
     var req = new XMLHttpRequest();
     req.open("GET", "/api/v1/temperature", false);
     req.send();
-    console.log(req.responseText);
     return JSON.parse(req.response).temperature;
 }
 
@@ -209,3 +213,54 @@ function addHumidityChart(ctx) {
     updateChart(chart, getHumidity, updateTime);
     return chart;
 }
+
+function addDevice(ctx) {
+
+    var dev = getDevice();
+
+    if (dev == null) { return; }
+
+    if (dev["udev"] == null) {
+        ctx.children["status"].innerHTML = dev["adev"].status;
+        ctx.children["status"].innerHTML = dev["adev"].info;
+    } else {
+        ctx.children["status"].innerHTML = dev["udev"].status;
+        ctx.children["info"].innerHTML = dev["udev"].info;
+    }
+
+    var temp = getTemperature();
+    var pres = getPressure();
+    var hum = getHumidity();
+
+    ctx.children["temperature"].innerHTML = temp[temp.length - 1];
+    ctx.children["pressure"].innerHTML = pres[pres.length - 1];
+    ctx.children["humidity"].innerHTML = hum[hum.length - 1];
+
+}
+
+function addAdminDevice(ctx) {
+
+    var dev = getDevice();
+
+    if (dev == null) { return; }
+
+    if (dev["udev"] != null) {
+        ctx.innerHTML = "No permissions"
+    } else {
+        ctx.children["status"].innerHTML = dev["adev"].status;
+        ctx.children["info"].innerHTML = dev["adev"].info;
+        ctx.children["battery"].innerHTML = dev["adev"].battery;
+        ctx.children["time"].innerHTML = dev["adev"].time;
+        ctx.children["model"].innerHTML = dev["adev"].model;
+    }
+
+    var temp = getTemperature();
+    var pres = getPressure();
+    var hum = getHumidity();
+
+    ctx.children["temperature"].innerHTML = temp[temp.length - 1];
+    ctx.children["pressure"].innerHTML = pres[pres.length - 1];
+    ctx.children["humidity"].innerHTML = hum[hum.length - 1];
+
+
+} 

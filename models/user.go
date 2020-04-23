@@ -28,11 +28,22 @@ const (
 	UserTemperatureTopic TopicType = "/api/v1/user/temperature"
 	UserHumidityTopic    TopicType = "/api/v1/user/humidity"
 	UserPressureTopic    TopicType = "/api/v1/user/pressure"
+	UserInfoTopic        TopicType = "/api/v1/user/info"
+	UserStatusTopic      TopicType = "/api/v1/user/status"
+
+	AdminTimeTopic    TopicType = "/api/v1/admin/work_time"
+	AdminBatteryTopic TopicType = "/api/v1/admin/battery"
+	AdminInfoTopic    TopicType = "/api/v1/admin/info"
+	AdminModelTopic   TopicType = "/api/v1/admin/model"
 
 	UndefindedTopic TopicType = ""
 )
 
-var UserTopics = [...]TopicType{UserTemperatureTopic, UserPressureTopic, UserHumidityTopic}
+var UserTopics = [...]TopicType{UserTemperatureTopic, UserPressureTopic, UserHumidityTopic,
+	UserInfoTopic, UserStatusTopic}
+var AdminTopics = [...]TopicType{UserTemperatureTopic, UserPressureTopic, UserHumidityTopic,
+	UserInfoTopic, UserStatusTopic, AdminTimeTopic, AdminBatteryTopic,
+	AdminInfoTopic, AdminModelTopic}
 
 func StringToTopic(str string) TopicType {
 	switch str {
@@ -42,6 +53,19 @@ func StringToTopic(str string) TopicType {
 		return UserHumidityTopic
 	case "/api/v1/user/pressure":
 		return UserPressureTopic
+	case "/api/v1/user/info":
+		return UserInfoTopic
+	case "/api/v1/user/status":
+		return UserStatusTopic
+	case "/api/v1/admin/work_time":
+		return AdminTimeTopic
+	case "/api/v1/admin/battery":
+		return AdminBatteryTopic
+	case "/api/v1/admin/info":
+		return AdminInfoTopic
+	case "/api/v1/admin/model":
+		return AdminModelTopic
+
 	}
 	return UndefindedTopic
 }
@@ -49,6 +73,7 @@ func StringToTopic(str string) TopicType {
 type Container struct {
 	MQTTContainer    map[string]*MQTTSubscriber
 	WeatherContainer map[string]*Weather
+	DeviceContainer  map[string]*Device
 	UsersContainer   map[string]string
 }
 
@@ -57,6 +82,7 @@ var globalContainer = Container{}
 func InitGlobalContainer() {
 	globalContainer.MQTTContainer = make(map[string]*MQTTSubscriber)
 	globalContainer.WeatherContainer = make(map[string]*Weather)
+	globalContainer.DeviceContainer = make(map[string]*Device)
 	globalContainer.UsersContainer = make(map[string]string)
 }
 
@@ -69,7 +95,8 @@ func NewUserContext(user User) *UserContext {
 	}
 	user.ID = fmt.Sprintf("mqtt-app-%d", rand.Int63())
 	weather := &Weather{}
-	subsciber := NewMQTTSubscriberConfig(user, UserTopics[:], weather)
+	device := &Device{}
+	subsciber := NewMQTTSubscriberConfig(user, AdminTopics[:], weather, device)
 
 	password, err := encrypt([]byte(config.GetConfig().Web.SessionKey), []byte(user.Password))
 	if err != nil {
@@ -84,6 +111,7 @@ func NewUserContext(user User) *UserContext {
 
 	globalContainer.MQTTContainer[uctx.User.ID] = subsciber
 	globalContainer.WeatherContainer[uctx.User.ID] = weather
+	globalContainer.DeviceContainer[uctx.User.ID] = device
 	if config.GetConfig().MQQT.MultipleUsers == false {
 		globalContainer.UsersContainer[user.Username] = uctx.User.ID
 	}
@@ -93,6 +121,7 @@ func NewUserContext(user User) *UserContext {
 func deleteUser(ID string) {
 	/* Remove Weather */
 	delete(globalContainer.WeatherContainer, ID)
+	delete(globalContainer.DeviceContainer, ID)
 
 	/* Remove Subcriber */
 	if subsciber, ok := globalContainer.MQTTContainer[ID]; !ok || subsciber == nil {
@@ -117,6 +146,14 @@ func (uctx UserContext) GetWeather() *Weather {
 		return nil
 	} else {
 		return weather
+	}
+}
+
+func (uctx UserContext) GetDevice() *Device {
+	if device, ok := globalContainer.DeviceContainer[uctx.User.ID]; !ok {
+		return nil
+	} else {
+		return device
 	}
 }
 

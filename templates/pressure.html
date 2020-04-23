@@ -14,46 +14,46 @@
 </head>
 
 <body>
-    <div class="wrapper">
-        <header>
-            <div class="container">
-                <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        <h1><a href="/logout" class="hover-color">Logout</a></h1>
-                    </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        <ul>
-                            <li><a href="/" class="hover-color">Dashboard</a></li>
-                            <li><a href="/temperature" class="hover-color">Temperature</a></li>
-                            <li><a href="/humidity" class="hover-color">Humidity</a></li>
-                            <li><a href="/pressure" class="hover-color">Pressure</a></li>
-                            <li><a href="/lighting" class="hover-color">Lighting</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </header>
+    <header class="header-login-logout">
 
-        <div class="content">
-            <div class="background-color admin-background-color admin-page-position height-style">
-                <div class="container">
+        <div class="header-limiter">
 
-                    <div class="chart-container" style="position: relative; height:75vh; width:75vw">
-                        <ul>
-                            <li><canvas id="pressure"></canvas></li>
-                        </ul>
-                    </div>
+            <h1><a href="/"><img src="/static/img/favicon.png" alt="Smiley face" height="42" width="42"> </a></h1>
 
-                    <script>
-                        var ctxT = document.getElementById('pressure').getContext('2d');
-                        var myT = addPressureChart(ctxT);
-                    </script>
-                </div>
-            </div>
+            <nav>
+                <a href="/temperature" class="hover-color">Temperature</a>
+                <a href="/humidity" class="hover-color">Humidity</a>
+                <a href="/pressure" class="hover-color">Pressure</a>
+                <a href="/lighting" class="hover-color">Lighting</a>
+            </nav>
+
+            <ul>
+                <li><a href="/admin">Admin Panel</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
 
         </div>
 
+    </header>
+
+    <!-- The content of your page would go here. -->
+
+
+    <div class="menu">
+        <div class="chart-container" style="position: relative; height:75vh; width:75vw">
+            <ul>
+                <li><canvas id="pressure"></canvas></li>
+            </ul>
+        </div>
+
+        <script>
+            var ctxT = document.getElementById('pressure').getContext('2d');
+            var myT = addPressureChart(ctxT);
+        </script>
+
     </div>
+
 </body>
+
 
 </html>

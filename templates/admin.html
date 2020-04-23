@@ -38,26 +38,18 @@
 
     <!-- The content of your page would go here. -->
 
+
     <div class="split left">
         <div class="centered-fix">
-            <div class="chart-container" style="position: relative; height:20vh; width:25vw">
-                <ul>
-                    <li><canvas id="temperature"></canvas></li>
-                    <li><canvas id="humidity"></canvas></li>
-                    <li><canvas id="pressure"></canvas></li>
-                </ul>
+            <div class="menu">
+
+                <div title="Firmware versions of sensors">
+                    <input type="checkbox" id="sensor1" name="sensor1" value="sensor1">
+                    <label for="sensor1"> <a href="/static/sensors/sensor1">sensor1</a> </label><br>
+                    <input type="checkbox" id="sensor2" name="sensor2" value="sensor2">
+                    <label for="sensor2"> <a href="/static/sensors/sensor2">sensor2</a> </label><br>
+                </div>
             </div>
-
-            <script>
-                var ctxT = document.getElementById('temperature').getContext('2d');
-                var myT = addTemperatureChart(ctxT);
-
-                var ctxH = document.getElementById('humidity').getContext('2d');
-                var myH = addHumidityChart(ctxH);
-
-                var ctxP = document.getElementById('pressure').getContext('2d');
-                var myP = addPressureChart(ctxP);
-            </script>
         </div>
     </div>
 
@@ -73,13 +65,18 @@
                 <hr>
                 <label>Status:</label><label id="status" name="status"></label>
                 <hr>
-                <label>User Info:</label><label id="info" name="info"></label>
+                <label>Admin Info:</label><label id="info" name="info"></label>
                 <hr>
+                <label>Battery:</label><label id="battery" name="battery"></label>
+                <hr>
+                <label>Work Time:</label><label id="time" name="time"></label>
+                <hr>
+                <label>Model:</label><label id="model" name="model"></label>
             </div>
 
             <script>
                 var ctxD = document.getElementById('device');
-                var myT = addDevice(ctxD);
+                var myT = addAdminDevice(ctxD);
             </script>
 
         </div>

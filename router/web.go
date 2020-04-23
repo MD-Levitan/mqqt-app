@@ -30,8 +30,8 @@ func humidityWebHandler(w http.ResponseWriter, r *http.Request) {
 	config.GetTmpl().ExecuteTemplate(w, "humidity.html", nil)
 }
 
-func updateWebHandler(w http.ResponseWriter, r *http.Request) {
-	config.GetTmpl().ExecuteTemplate(w, "update.html", nil)
+func adminWebHandler(w http.ResponseWriter, r *http.Request) {
+	config.GetTmpl().ExecuteTemplate(w, "admin.html", nil)
 }
 
 func logoutWebHandler(w http.ResponseWriter, r *http.Request) {
